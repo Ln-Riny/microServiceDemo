@@ -1,0 +1,7 @@
+FROM bladex/sentinel-dashboard:1.8.5
+
+LABEL maintainer="491861364@qq.com"
+
+RUN apk update && \
+    apk add --no-cache curl && \
+    rm -rf /var/cache/apk/*

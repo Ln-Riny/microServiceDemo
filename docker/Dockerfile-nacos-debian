@@ -1,0 +1,14 @@
+FROM nacos/nacos-server:v2.2.0-slim 
+# 3. 安装缺失的工具：这里安装 curl（解决健康检查报错）
+
+# 2. 维护者信息（可选，标注镜像作者）
+LABEL maintainer="491861364@qq.com"
+
+# 3. 安装缺失的工具：这里安装 curl（解决健康检查报错）
+# 针对 Alpine 系统的指令（新版 Nacos 镜像默认用 Alpine
+RUN apt-get update && \
+    # 安装 curl，--no-install-recommends 减少冗余依赖
+    apt-get install -y --no-install-recommends curl && \
+    # 清理缓存，减小镜像体积（必加）
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

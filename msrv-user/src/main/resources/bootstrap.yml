@@ -1,0 +1,35 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: msrv-user
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+        username: nacos
+        password: nacos
+        # 增加连接配置
+        connect-timeout: 5000
+        timeout: 5000
+        heart-beat-timeout: 8000
+        heart-beat-interval: 3000
+        # 重试配置
+        retry:
+          max-retry: 10
+          retry-delay: 1000
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+        namespace: public
+        group: DEFAULT_GROUP
+        username: nacos
+        password: nacos
+        timeout: 5000
+        connect-timeout: 5000
+        # 配置重试
+        max-retry: 10
+        retry-delay: 1000
+        # 等待配置加载完成
+        fail-fast: false

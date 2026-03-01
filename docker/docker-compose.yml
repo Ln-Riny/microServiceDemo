@@ -1,0 +1,150 @@
+version: '3.8'
+services:
+  # Nacos（核心优先，最稳定的ARM版本）
+  nacos:
+    image: reeves-nacos:v2.2.0
+    container_name: nacos
+    platform: linux/arm64/v8
+    ports:
+      - "8848:8848"
+      - "9848:9848"   # gRPC 核心通信端口（2.x 必须映射）
+      - "9849:9849"   # gRPC 集群端口（单机也建议映射）
+    environment:
+      - MODE=standalone  # 单机模式（去掉认证，避免配置错误）
+      - JVM_XMS=256m
+      - JVM_XMX=256m
+    volumes:
+      - nacos-data:/home/nacos/data
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8848/nacos/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ms-network
+
+  # Sentinel（替换为100%兼容ARM的版本）
+  sentinel:
+    image: reeves-sentinel:1.8.5  # 1.8.5比1.8.6更稳定
+    container_name: sentinel
+    ports:
+      - "8858:8858"
+    environment:
+      - JAVA_OPTS=-Xms128m -Xmx128m
+    depends_on:
+      nacos:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8858/#/dashboard"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+    networks:
+      - ms-network
+
+  # Seata（简化配置，优先启动）
+  seata:
+    image: reeves-seata:1.7.1
+    container_name: seata
+    platform: linux/arm64/v8
+    ports:
+      - "8091:8091"
+      - "7091:7091"
+    environment:
+      - STORE_MODE=file
+      - JVM_OPTS=-Xms128m -Xmx128m
+    restart: on-failure
+    depends_on:
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8091; exec 3>&-; exec 3<&-"]
+    # test: ["CMD", "curl", "-f", "http://localhost:7091/api/v1/health/check"]
+      interval: 10s        # 每10秒检查一次
+      timeout: 5s          # 单次检查超时时间（5秒）
+      retries: 3           # 重试3次（总共等待30秒）
+      start_period: 15s
+    networks:
+      - ms-network
+
+#  # SkyWalking OAP（延迟启动，避免依赖问题）
+#  skywalking-oap:
+#    image: reeves-skywalkingaop:9.4.0
+#    container_name: skywalking-oap
+#    platform: linux/arm64/v8
+#    ports:
+#      - "11800:11800"
+#      - "12800:12800"
+#    environment:
+#      - SW_STORAGE=h2
+#      - JAVA_OPTS=-Xms512m -Xmx512m
+#    restart: unless-stopped
+#    depends_on:
+#      seata:
+#        condition: service_healthy
+#    # SkyWalking OAP健康检查：测试12800端口接口
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:12800/graphql"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 20s
+#    networks:
+#     - ms-network
+#  skywalking-ui:
+#    image: reeves-skywalkingui:9.4.0
+#    container_name: skywalking-ui
+#    platform: linux/arm64/v8
+#    ports:
+#      - "8088:8080"
+#    environment:
+#      - SW_OAP_ADDRESS=http://skywalking-oap:12800
+#    restart: on-failure
+  mysql8:
+    # 核心：选择支持 ARM64 架构的 MySQL 8 官方镜像（适配 Mac M 系列芯片）
+    image: mysql:8.0.45-oraclelinux9
+    # 强制指定架构（兜底适配 Mac ARM64）
+    platform: linux/arm64/v8
+    # 容器名称（便于管理）
+    container_name: mysql8-arm64
+    # 端口映射：宿主机 3306 → 容器 3306（Mac 下若3306被占用，可改宿主机端口如 3307:3306）
+    ports:
+      - "3306:3306"
+    # 环境变量（核心配置）
+    environment:
+      # ROOT 密码（按你的要求设置为 456123）
+      - MYSQL_ROOT_PASSWORD=456123
+      # 可选：启动时自动创建的数据库（按需保留/删除）
+      - MYSQL_DATABASE=default_db
+      # 时区适配（避免时间错乱，推荐上海时区）
+      - TZ=Asia/Shanghai
+      # MySQL 字符集（避免中文乱码）
+      - MYSQL_INITDB_ARGS=--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # 重启策略：除非手动停止，否则始终重启（保障服务稳定性）
+    restart: unless-stopped
+    # 健康检查（检测 MySQL 是否正常运行）
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p456123", "--silent"]
+      interval: 10s       # 检查间隔
+      retries: 5          # 重试次数
+      start_period: 30s   # 启动后等待30秒再检查（给MySQL初始化时间）
+      timeout: 5s         # 单次检查超时时间
+    # 数据挂载：宿主机指定目录 → 容器 MySQL 数据目录（核心需求）
+    volumes:
+      # 替换这里的「~/docker/mysql8/data」为你想挂载的宿主机目录（比如 /Users/你的用户名/mysql/data）
+      - ~/docker/mysql8/data:/var/lib/mysql
+      # 可选：挂载自定义配置文件（若需要修改my.cnf，可取消注释并创建对应文件）
+      # - ./my.cnf:/etc/mysql/conf.d/custom.cnf
+    # 网络配置（默认桥接网络，简单够用）
+    networks:
+      - ms-network
+
+volumes:
+  nacos-data:
+
+networks:
+  ms-network:
+    driver: bridge

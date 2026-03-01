@@ -1,0 +1,10 @@
+FROM  apache/skywalking-oap-server:9.4.0
+
+LABEL maintainer="491861364@qq.com"
+
+RUN apt-get update && \
+    # 安装 curl，--no-install-recommends 减少冗余依赖
+    apt-get install -y --no-install-recommends curl && \
+    # 清理缓存，减小镜像体积（必加）
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

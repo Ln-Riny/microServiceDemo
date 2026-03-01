@@ -1,0 +1,48 @@
+server:
+  port: 8080  # 网关端口（所有请求先访问网关）
+spring:
+  application:
+    name: cloud-gateway  # 网关服务名（注册到Nacos）
+  cloud:
+    # Nacos 注册发现配置
+    nacos:
+      discovery:
+        server-addr: localhost:8848  # Nacos地址
+        connect-timeout: 60000       # 适配之前的Nacos 9848端口问题，加大超时
+    # Gateway 核心配置
+    gateway:
+      # 路由规则配置
+      routes:
+        # 路由1：转发到用户服务（cloud-user）
+        - id: user-service-route  # 路由ID（唯一即可）
+          uri: lb://msrv-user    # lb=负载均衡，指向Nacos中的cloud-user服务
+          predicates:             # 断言（匹配规则）：路径以/user/开头的请求转发到user服务
+            - Path=/user/**
+          filters:                # 过滤器（可选）：去除请求路径中的/user前缀（可选配置）
+            - StripPrefix=1       # 比如请求/gateway/user/get/1 → 转发到cloud-user/get/1
+
+        # 路由2：转发到订单服务（cloud-order）
+        - id: order-service-route
+          uri: lb://msrv-order
+          predicates:
+            - Path=/order/**
+          filters:
+            - StripPrefix=1
+
+      # 从Nacos自动发现服务（可选，简化路由配置，生产常用）
+      discovery:
+        locator:
+          enabled: true          # 开启服务发现路由
+          lower-case-service-id: true  # 服务名小写（避免大小写问题）
+
+# 可选：暴露网关监控端点（方便查看路由规则）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,routes  # 暴露网关和路由端点
+  endpoint:
+    gateway:
+      enabled: true
+    routes:
+      enabled: true
