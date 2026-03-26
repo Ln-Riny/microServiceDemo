@@ -1,0 +1,18 @@
+package me.lining.learn.mapper;
+
+import me.lining.learn.entity.AccountTbl;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author your_name
+ * @since 2026-03-21
+ */
+@Mapper
+public interface AccountTblMapper extends BaseMapper<AccountTbl> {
+
+}

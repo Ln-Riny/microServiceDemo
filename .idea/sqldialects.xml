@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/msrv-order/sql/order.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/msrv-product/sql/product.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/msrv-user/sql/users.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/sql/seata.sql" dialect="MySQL" />
+  </component>
+</project>

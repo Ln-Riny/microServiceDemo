@@ -12,6 +12,12 @@ spring:
     # Gateway 核心配置
     gateway:
       # 路由规则配置
+      httpclient:
+        websocket:
+          enabled: true
+        # 长连接超时配置
+        connect-timeout: 5000
+        response-timeout: 30s
       routes:
         # 路由1：转发到用户服务（cloud-user）
         - id: user-service-route  # 路由ID（唯一即可）
@@ -26,6 +32,13 @@ spring:
           uri: lb://msrv-order
           predicates:
             - Path=/order/**
+          filters:
+            - StripPrefix=1
+
+        - id: websocket-alarm-service
+          uri: ws://alarm-service:8081  # 或使用 lb:ws://alarm-service 实现负载均衡
+          predicates:
+            - Path=/ws/alarm/**
           filters:
             - StripPrefix=1
 

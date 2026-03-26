@@ -1,0 +1,19 @@
+rocketmq:
+  name-server: 127.0.0.1:9876  # NameServer 地址（本地部署默认端口）
+  producer:
+    group: demo-producer-group  # 生产者组名
+    send-message-timeout: 3000  # 发送超时时间
+    compress-message-body-threshold: 4096  # 消息压缩阈值
+    max-message-size: 4194304
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/msrv_demo?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 456123
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml # 扫描XML文件
+  type-aliases-package: me.lining.learn.entity # 实体类别名包
+  configuration:
+    map-underscore-to-camel-case: true # 开启下划线转驼峰
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志（可选）

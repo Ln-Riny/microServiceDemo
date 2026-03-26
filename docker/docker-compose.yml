@@ -17,7 +17,7 @@ services:
       - nacos-data:/home/nacos/data
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:8848/nacos/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://127.0.0.1:8848/nacos/actuator/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,7 +38,7 @@ services:
         condition: service_healthy
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8858/#/dashboard"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8858/#/dashboard" ]
       interval: 10s
       timeout: 5s
       start_period: 10s
@@ -61,8 +61,8 @@ services:
       nacos:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8091; exec 3>&-; exec 3<&-"]
-    # test: ["CMD", "curl", "-f", "http://localhost:7091/api/v1/health/check"]
+      test: [ "CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8091; exec 3>&-; exec 3<&-" ]
+      # test: ["CMD", "curl", "-f", "http://localhost:7091/api/v1/health/check"]
       interval: 10s        # 每10秒检查一次
       timeout: 5s          # 单次检查超时时间（5秒）
       retries: 3           # 重试3次（总共等待30秒）
@@ -70,39 +70,39 @@ services:
     networks:
       - ms-network
 
-#  # SkyWalking OAP（延迟启动，避免依赖问题）
-#  skywalking-oap:
-#    image: reeves-skywalkingaop:9.4.0
-#    container_name: skywalking-oap
-#    platform: linux/arm64/v8
-#    ports:
-#      - "11800:11800"
-#      - "12800:12800"
-#    environment:
-#      - SW_STORAGE=h2
-#      - JAVA_OPTS=-Xms512m -Xmx512m
-#    restart: unless-stopped
-#    depends_on:
-#      seata:
-#        condition: service_healthy
-#    # SkyWalking OAP健康检查：测试12800端口接口
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:12800/graphql"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-#      start_period: 20s
-#    networks:
-#     - ms-network
-#  skywalking-ui:
-#    image: reeves-skywalkingui:9.4.0
-#    container_name: skywalking-ui
-#    platform: linux/arm64/v8
-#    ports:
-#      - "8088:8080"
-#    environment:
-#      - SW_OAP_ADDRESS=http://skywalking-oap:12800
-#    restart: on-failure
+  #  # SkyWalking OAP（延迟启动，避免依赖问题）
+  #  skywalking-oap:
+  #    image: reeves-skywalkingaop:9.4.0
+  #    container_name: skywalking-oap
+  #    platform: linux/arm64/v8
+  #    ports:
+  #      - "11800:11800"
+  #      - "12800:12800"
+  #    environment:
+  #      - SW_STORAGE=h2
+  #      - JAVA_OPTS=-Xms512m -Xmx512m
+  #    restart: unless-stopped
+  #    depends_on:
+  #      seata:
+  #        condition: service_healthy
+  #    # SkyWalking OAP健康检查：测试12800端口接口
+  #    healthcheck:
+  #      test: ["CMD", "curl", "-f", "http://localhost:12800/graphql"]
+  #      interval: 10s
+  #      timeout: 5s
+  #      retries: 5
+  #      start_period: 20s
+  #    networks:
+  #     - ms-network
+  #  skywalking-ui:
+  #    image: reeves-skywalkingui:9.4.0
+  #    container_name: skywalking-ui
+  #    platform: linux/arm64/v8
+  #    ports:
+  #      - "8088:8080"
+  #    environment:
+  #      - SW_OAP_ADDRESS=http://skywalking-oap:12800
+  #    restart: on-failure
   mysql8:
     # 核心：选择支持 ARM64 架构的 MySQL 8 官方镜像（适配 Mac M 系列芯片）
     image: mysql:8.0.45-oraclelinux9
@@ -127,7 +127,7 @@ services:
     restart: unless-stopped
     # 健康检查（检测 MySQL 是否正常运行）
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p456123", "--silent"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p456123", "--silent" ]
       interval: 10s       # 检查间隔
       retries: 5          # 重试次数
       start_period: 30s   # 启动后等待30秒再检查（给MySQL初始化时间）
@@ -141,7 +141,47 @@ services:
     # 网络配置（默认桥接网络，简单够用）
     networks:
       - ms-network
-
+  rmqnamesrv:
+    image: apache/rocketmq:5.3.2
+    container_name: rmqnamesrv
+    ports:
+      - 9876:9876
+    networks:
+      - ms-network
+    command: sh mqnamesrv
+  broker:
+    image: apache/rocketmq:5.3.2
+    container_name: rmqbroker
+    volumes:
+      - ./conf/broker.conf:/home/rocketmq/conf/broker.conf
+      - ./logs/broker:/home/rocketmq/logs
+      - ./store:/home/rocketmq/store
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+    depends_on:
+      - rmqnamesrv
+    networks:
+      - ms-network
+    command: sh mqbroker -c /home/rocketmq/conf/broker.conf
+  proxy:
+    image: apache/rocketmq:5.3.2
+    container_name: rmqproxy
+    networks:
+      - ms-network
+    depends_on:
+      - broker
+      - rmqnamesrv
+    ports:
+      - 8080:8080
+      - 8081:8081
+    restart: on-failure
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+    command: sh mqproxy
 volumes:
   nacos-data:
 

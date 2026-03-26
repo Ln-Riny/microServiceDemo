@@ -1,5 +1,6 @@
 package me.lining.learn;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -12,7 +13,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 // 开启服务注册发现
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "me.lining.learn.services")
+@EnableFeignClients(basePackages = "me.lining.learn.service")
+@MapperScan(basePackages = "me.lining.learn.mapper")
 public class MsrvOrderApplication {
     public static void main(String[] args)  {
         SpringApplication.run(MsrvOrderApplication.class, args);

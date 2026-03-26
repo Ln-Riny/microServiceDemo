@@ -1,4 +1,4 @@
-package me.lining.learn.services;
+package me.lining.learn.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

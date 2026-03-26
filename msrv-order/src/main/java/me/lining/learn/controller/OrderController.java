@@ -2,18 +2,19 @@ package me.lining.learn.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.alibaba.csp.sentinel.slots.block.RuleConstant;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
 import com.alibaba.csp.sentinel.slots.block.degrade.circuitbreaker.CircuitBreakerStrategy;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowException;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
-import me.lining.learn.services.RpcOrderService;
+import me.lining.learn.service.RpcOrderService;
+import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
+import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -26,9 +27,13 @@ import javax.annotation.PostConstruct;
  */
 @RestController
 @RequestMapping("/order")
-public class OrderController {
+@RocketMQMessageListener(topic = "TestTopic", consumerGroup = "demo-consumer-group")
+public class OrderController implements RocketMQListener<String> {
+
     @Autowired
     private RpcOrderService rpcOrderService;
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
 
     // 限流：1秒最多2个请求
     @SentinelResource(value = "createOrder",
@@ -41,6 +46,23 @@ public class OrderController {
         return "创建订单成功，" + user;
     }
 
+    @GetMapping("/rocketmq/send")
+    public void sendMessage(@RequestParam String topic, @RequestParam String message) {
+        try {
+            // 发送同步消息（最常用）
+            rocketMQTemplate.convertAndSend(topic, message);
+            System.out.println("消息发送成功：" + message);
+        } catch (Exception e) {
+            System.err.println("消息发送失败：" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onMessage(String message) {
+        System.out.println("消费者接收到消息：" + message);
+        // 此处可添加业务逻辑（如入库、调用接口等）
+    }
 
     // 限流降级方法（参数要和原方法一致，最后加BlockException）
     public String createOrderBlockHandler(Long userId, BlockException e) {
