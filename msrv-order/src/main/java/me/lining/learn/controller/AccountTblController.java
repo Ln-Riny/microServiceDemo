@@ -1,14 +1,15 @@
 package me.lining.learn.controller;
 
-
+import lombok.extern.slf4j.Slf4j;
 import me.lining.learn.entity.AccountTbl;
 import me.lining.learn.service.AccountTblService;
-import me.lining.learn.trace.TraceContext;
+import me.lining.learn.trace.TraceIdUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.Executor;
 
 /**
  * <p>
@@ -19,11 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-03-21
  */
 @RestController
+@Slf4j
 @RequestMapping("/accountTbl")
 public class AccountTblController {
 
     @Autowired
     private AccountTblService accountTblService;
+
+    @Qualifier("taskExecutor")
+    @Autowired
+    Executor taskExecutor;
 
     @RequestMapping("/insert")
     public Boolean insert() {
@@ -32,13 +38,14 @@ public class AccountTblController {
 
     @RequestMapping("/test")
     public void test() {
-        System.out.println("主线程：" + TraceContext.getTraceId());
+        log.info(("主线程：" + TraceIdUtils.getTraceId()));
 
+        System.out.println("hellll");
         // 开启子线程
-        new Thread(() -> {
+        taskExecutor.execute(() -> {
             // 子线程 自动 获取父线程的 traceId！
-            System.out.println("子线程：" + TraceContext.getTraceId());
-        }).start();
+            log.info("子线程：" + TraceIdUtils.getTraceId());
+        });
     }
 }
 

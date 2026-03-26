@@ -18,17 +18,17 @@ public class TraceInterceptor implements HandlerInterceptor {
 
         // 2. 没有则生成
         if (traceId == null || traceId.isEmpty()) {
-            traceId = TraceContext.generateTraceId();
+            traceId = TraceIdUtils.generateTraceId();
         }
 
         // 3. 存入上下文
-        TraceContext.setTraceId(traceId);
+        TraceIdUtils.setTraceId(traceId);
         return true;
     }
 
     // 请求完成后必须清除
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        TraceContext.remove();
+        TraceIdUtils.removeTraceId();
     }
 }
