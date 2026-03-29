@@ -1,6 +1,6 @@
-package me.lining.learn.configuration;
+package me.lining.learn.infrastructure.configuration;
 
-import me.lining.learn.trace.TraceInterceptor;
+import me.lining.learn.infrastructure.trace.TraceInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

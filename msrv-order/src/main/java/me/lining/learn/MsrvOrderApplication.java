@@ -10,7 +10,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @author lining
  * @date 2026/02/28 20:09
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "me.lining.learn")
 // 开启服务注册发现
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "me.lining.learn.service")

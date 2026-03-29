@@ -1,4 +1,4 @@
-package me.lining.learn.entity;
+package me.lining.learn.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;

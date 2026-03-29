@@ -1,4 +1,4 @@
-package me.lining.learn.controller;
+package me.lining.learn.interfaces.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;

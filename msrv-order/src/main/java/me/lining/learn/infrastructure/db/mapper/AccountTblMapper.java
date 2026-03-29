@@ -1,6 +1,6 @@
-package me.lining.learn.mapper;
+package me.lining.learn.infrastructure.db.mapper;
 
-import me.lining.learn.entity.AccountTbl;
+import me.lining.learn.domain.entity.AccountTbl;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

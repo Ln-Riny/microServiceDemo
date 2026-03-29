@@ -1,4 +1,4 @@
-package me.lining.learn.trace;
+package me.lining.learn.infrastructure.trace;
 
 import org.springframework.web.servlet.HandlerInterceptor;
 

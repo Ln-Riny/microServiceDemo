@@ -6,6 +6,10 @@ rocketmq:
     compress-message-body-threshold: 4096  # 消息压缩阈值
     max-message-size: 4194304
 spring:
+  main:
+    lazy-initialization: true  # 开启全局懒加载
+    allow-bean-definition-overriding: false
+    async-init: true  # 异步初始化Bean
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/msrv_demo?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai

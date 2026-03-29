@@ -1,8 +1,8 @@
-package me.lining.learn.service.impl;
+package me.lining.learn.domain.service.impl;
 
-import me.lining.learn.entity.AccountTbl;
-import me.lining.learn.mapper.AccountTblMapper;
-import me.lining.learn.service.AccountTblService;
+import me.lining.learn.domain.service.AccountTblService;
+import me.lining.learn.domain.entity.AccountTbl;
+import me.lining.learn.infrastructure.db.mapper.AccountTblMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

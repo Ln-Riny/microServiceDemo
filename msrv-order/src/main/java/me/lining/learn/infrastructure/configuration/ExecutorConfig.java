@@ -1,7 +1,7 @@
-package me.lining.learn.configuration;
+package me.lining.learn.infrastructure.configuration;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
-import me.lining.learn.trace.MDCTaskDecorator;
+import me.lining.learn.infrastructure.trace.MDCTaskDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;

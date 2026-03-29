@@ -1,4 +1,4 @@
-package me.lining.learn.controller;
+package me.lining.learn.interfaces.controller;
 
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;

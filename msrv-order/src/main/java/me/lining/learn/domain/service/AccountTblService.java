@@ -1,6 +1,6 @@
-package me.lining.learn.service;
+package me.lining.learn.domain.service;
 
-import me.lining.learn.entity.AccountTbl;
+import me.lining.learn.domain.entity.AccountTbl;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
