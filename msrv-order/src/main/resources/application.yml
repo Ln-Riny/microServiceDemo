@@ -21,3 +21,8 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true # 开启下划线转驼峰
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志（可选）
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://127.0.0.1:8848

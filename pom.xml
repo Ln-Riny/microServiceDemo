@@ -13,6 +13,7 @@
         <module>msrv-product</module>
         <module>msrv-order</module>
         <module>msrv-gateway</module>
+        <module>msrv-api</module>
     </modules>
 
     <!-- 统一版本控制 -->

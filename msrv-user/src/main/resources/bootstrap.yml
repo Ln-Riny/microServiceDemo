@@ -6,19 +6,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
-        namespace: public
-        username: nacos
-        password: nacos
-        # 增加连接配置
-        connect-timeout: 5000
-        timeout: 5000
-        heart-beat-timeout: 8000
-        heart-beat-interval: 3000
-        # 重试配置
-        retry:
-          max-retry: 10
-          retry-delay: 1000
+        enabled: false
       config:
         server-addr: localhost:8848
         file-extension: yaml
@@ -33,3 +21,13 @@ spring:
         retry-delay: 1000
         # 等待配置加载完成
         fail-fast: false
+dubbo:
+  application:
+    name: msrv-user
+  registry:
+    address: nacos://127.0.0.1:8848
+  protocol:
+    name: dubbo
+    port: 20880
+  scan:
+    base-packages: me.lining.learn.interfaces.facade.dubbo

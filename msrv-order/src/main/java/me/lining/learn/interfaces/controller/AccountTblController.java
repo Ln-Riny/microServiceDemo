@@ -1,9 +1,12 @@
 package me.lining.learn.interfaces.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import me.lining.learn.api.dto.UserDTO;
+import me.lining.learn.api.service.UserService;
 import me.lining.learn.domain.entity.AccountTbl;
 import me.lining.learn.domain.service.AccountTblService;
 import me.lining.learn.infrastructure.trace.TraceIdUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,8 @@ public class AccountTblController {
 
     @Autowired
     private AccountTblService accountTblService;
+    @DubboReference
+    private UserService userService;
 
     @Qualifier("taskExecutor")
     @Autowired
@@ -35,6 +40,11 @@ public class AccountTblController {
     @RequestMapping("/insert")
     public Boolean insert() {
         return accountTblService.save(AccountTbl.builder().userId("2L").money(1000).build());
+    }
+
+    @RequestMapping("/getUser")
+    public UserDTO getUser() {
+        return userService.getUserById(1L);
     }
 
     @RequestMapping("/test")
