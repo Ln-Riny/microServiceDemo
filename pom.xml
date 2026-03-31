@@ -14,6 +14,7 @@
         <module>msrv-order</module>
         <module>msrv-gateway</module>
         <module>msrv-api</module>
+        <module>msrv-demo</module>
     </modules>
 
     <!-- 统一版本控制 -->
