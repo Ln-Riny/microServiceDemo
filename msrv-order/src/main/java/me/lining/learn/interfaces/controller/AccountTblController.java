@@ -3,6 +3,8 @@ package me.lining.learn.interfaces.controller;
 import lombok.extern.slf4j.Slf4j;
 import me.lining.learn.api.dto.UserDTO;
 import me.lining.learn.api.service.UserService;
+import me.lining.learn.aspect.submit.SubmitLimit;
+import me.lining.learn.aspect.submit.SubmitType;
 import me.lining.learn.domain.entity.AccountTbl;
 import me.lining.learn.domain.service.AccountTblService;
 import me.lining.learn.infrastructure.trace.TraceIdUtils;
@@ -43,6 +45,7 @@ public class AccountTblController {
     }
 
     @RequestMapping("/getUser")
+    @SubmitLimit(prefix = "getUser", type = SubmitType.DEFAULT)
     public UserDTO getUser() {
         return userService.getUserById(1L);
     }

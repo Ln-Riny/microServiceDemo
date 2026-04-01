@@ -105,5 +105,10 @@
             <artifactId>msrv-api</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>me.lining.learn</groupId>
+            <artifactId>msrv-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 </project>

@@ -12,7 +12,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication(scanBasePackages = "me.lining.learn")
 // 开启服务注册发现
 @EnableDiscoveryClient
-@MapperScan
+@MapperScan("me.lining.learn.**.mapper")
 public class MsrvOrderApplication {
     public static void main(String[] args)  {
         SpringApplication.run(MsrvOrderApplication.class, args);
